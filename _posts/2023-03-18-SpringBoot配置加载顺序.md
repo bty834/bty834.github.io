@@ -1,6 +1,6 @@
 ---
 layout: mypost
-title: 一些常用指令
+title: SpringBoot配置加载顺序
 categories: [Java,SpringBoot]
 extMath: true
 ---

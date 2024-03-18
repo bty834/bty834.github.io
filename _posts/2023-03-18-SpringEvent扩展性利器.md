@@ -1,6 +1,6 @@
 ---
 layout: mypost
-title: 一些常用指令
+title: SpringEvent扩展性利器
 categories: [Java,Spring]
 extMath: true
 ---
