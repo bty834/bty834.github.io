@@ -275,7 +275,8 @@ public class ValidatorConfiguration {
 目前Spring仅默认支持@RequestBody的参数校验，可以自定义AOP切面实现普通方法的校验。
 
 注解：
-```Java
+
+```java
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -299,8 +300,9 @@ public @interface ValidateMethodArgs {
 }
 
 ```
+
 切面处理：
-```Java
+```java
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
