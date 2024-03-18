@@ -5,7 +5,7 @@ title: baotingyu's homepage
 description: 鲍庭玉的个人博客
 keywords: bty,Blog,Java,Life
 author: baotingyu
-footerText: 'Copyright © 没有'
+footerText: ''
 
 # 这些不要动
 permalink: /posts/:year/:month/:day/:title.html
