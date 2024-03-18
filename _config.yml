@@ -26,7 +26,7 @@ baseurl: ''
 menu:
   - title: 首页
     url: /
-  - title: 归类
+  - title: 分类
     url: /pages/categories.html
   - title: 搜索
     url: /pages/search.html
