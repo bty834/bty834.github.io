@@ -3,20 +3,16 @@ layout: mypost
 title: 关于我
 ---
 
-> Hello 陌生人，欢迎访问 TMaize Blog
+简介：
 
-该博客托管于 GitHub Page，国内解析到腾讯云对象存储，以保证国内外的访问速度，留言页面使用腾讯的“吐个槽”
+- 2016.09-2020.06 大连海事大学 自动化 本科
 
-主题是自己写的，见[tmaize-blog](https://github.com/TMaize/tmaize-blog)，喜欢的话可以给个小星星。另外欢迎添加友链，在[留言板](chat.html)留言即可
+- 2020.09-2023.12 大连理工大学 电子信息 硕士研究生
 
-## 相关技能
+- 2023.03-至今 高途 Java研发
 
-全栈开发，第一份工作主要使用 Java（现在快忘了），使用过一段时间 Golang，目前在做前端 JavaScript、Node.js，主要是 Vue 技术栈。熟悉数据库，Docker，运维相关技术
+联系我：
 
-如有远程工作的机会欢迎联系我 😄
+- Email&nbsp;: [2300175122@qq.com](mailto:2300175122@qq.com)
 
-## 联系我
-
-- Email&nbsp;: [1772314831@qq.com](mailto:1772314831@qq.com)
-
-- GitHub: [https://github.com/tmaize](https://github.com/tmaize)
+- GitHub: [https://github.com/bty834](https://github.com/bty834)
