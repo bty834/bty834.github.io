@@ -85,9 +85,9 @@ input:-webkit-autofill {
 .hide {
   display: none !important;
 }
-/*.hover-underline {*/
-/*  position: relative;*/
-/*}*/
+.hover-underline {
+  position: relative;
+}
 /*.hover-underline:after {*/
 /*  content: '';*/
 /*  position: absolute;*/
@@ -100,10 +100,11 @@ input:-webkit-autofill {
 /*  transform: scaleX(0);*/
 /*  transition: transform 200ms ease-in-out;*/
 /*}*/
-/*.hover-underline:hover:after {*/
-/*  visibility: visible;*/
-/*  transform: scaleX(1);*/
-/*}*/
+.hover-underline:hover:after {
+  visibility: visible;
+  transform: scale(1.1);
+  transition: transform 100ms ease-in-out;
+}
 .header {
   padding: 40px 0;
   display: flex;
