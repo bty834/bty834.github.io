@@ -1,7 +1,7 @@
 ---
 layout: mypost
 title: SpringEvent扩展性利器
-categories: [Java,Spring]
+categories: [ Java,Spring ]
 extMath: true
 ---
 
@@ -9,10 +9,10 @@ extMath: true
 
 ![](event.png)
 
-使用Spring Event来发布应用内部领域事件，对于事件监听器可通过注解或类的方式来扩展，Spring Event内部使用观察者模式，但api使用层面可以完全解耦事件发布和事件监听：
+使用Spring Event来发布应用内部领域事件，对于事件监听器可通过注解或类的方式来扩展，Spring
+Event内部使用观察者模式，但api使用层面可以完全解耦事件发布和事件监听：
 
 ![](img.png)
-
 
 常用方式：
 
@@ -45,12 +45,13 @@ public class ClazzHourEventListener {
 ```
 
 注解实现事件监听需要考虑一下三个方面的内容：
+
 - 异步：如何实现异步
 - 事务：调用者的事务和监听器事务关系，包括异步情况下
 - 异常处理：异常需要捕获吗？对事务有什么影响
 
-
 测试如下：
+
 ```java
 @Service
 public class BizService {
@@ -165,4 +166,6 @@ public class TestTxListener {
 }
 ```
 
-由此可见 EventListener 执行过程中遇到异常终止，则后续的同步&异步EventListener都不会执行（之前的会执行，使用@Order控制顺序），而TransactionalEventListener相互之间不受影响。所以使用EventListener要做好异常处理。此外TransactionalEventListener方法内使用事务（默认afterCommit）需要注明@Transactional(propogation=REQUIRES_NEW)或使用编程式事务，但是如果@Async异步时，就不需要指定，因为事务是绑定线程的。
+由此可见 EventListener
+执行过程中遇到异常终止，则后续的同步&异步EventListener都不会执行（之前的会执行，使用@Order控制顺序），而TransactionalEventListener相互之间不受影响。所以使用EventListener要做好异常处理。此外TransactionalEventListener方法内使用事务（默认afterCommit）需要注明@Transactional(
+propogation=REQUIRES_NEW)或使用编程式事务，但是如果@Async异步时，就不需要指定，因为事务是绑定线程的。

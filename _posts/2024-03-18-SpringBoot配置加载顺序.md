@@ -1,7 +1,7 @@
 ---
 layout: mypost
 title: SpringBoot配置加载顺序
-categories: [Java,SpringBoot]
+categories: [ Java,SpringBoot ]
 extMath: true
 ---
 
