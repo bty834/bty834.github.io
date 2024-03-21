@@ -1,6 +1,8 @@
 html.dark {
   color: #c9d1d9;
-  background: #0d1117;
+  /*background: #0d1117;*/
+  background-image: url(../img/dark.jpg);
+  background-size: cover;
 }
 html.dark ::selection {
   background-color: #327bd4;

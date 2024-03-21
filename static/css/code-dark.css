@@ -1,8 +1,7 @@
 html.dark .highlight,
 html.dark pre.highlight {
   /* background: #282c34; */
-  background-image: url(../img/dark.jpg);
-  background-size: cover;
+  background: #161b22;
   color: #abb2bf;
 }
 html.dark .highlight pre {
