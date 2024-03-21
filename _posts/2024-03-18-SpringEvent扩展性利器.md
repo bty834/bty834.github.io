@@ -12,7 +12,7 @@ extMath: true
 使用Spring Event来发布应用内部领域事件，对于事件监听器可通过注解或类的方式来扩展，Spring
 Event内部使用观察者模式，但api使用层面可以完全解耦事件发布和事件监听：
 
-![](img.png)
+![](../posts/2024/03/21/img.png)
 
 常用方式：
 
