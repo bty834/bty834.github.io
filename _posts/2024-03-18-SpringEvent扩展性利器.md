@@ -1,6 +1,6 @@
 ---
 title: SpringEvent扩展性利器
-categories: [Spring ]
+categories: [编程,Java,Spring ]
 ---
 
 使用Spring Event机制可以保证高扩展性：

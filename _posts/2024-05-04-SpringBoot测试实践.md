@@ -1,6 +1,6 @@
 ---
 title: SpringBoot测试实践
-categories: [SpringBoot Test]
+categories: [编程,Java, Spring]
 ---
 
 测试按照粒度可分为3层：

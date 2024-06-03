@@ -1,6 +1,6 @@
 ---
 title: 手写Maven插件生成MyBatis代码
-categories: [Maven plugin]
+categories: [编程,plugin]
 ---
 
 
