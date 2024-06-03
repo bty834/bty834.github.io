@@ -52,7 +52,7 @@ extMath: true
 发现它只能注解在注解上，等于它是一个元注解，而我们放在参数上标识校验的注解需要自行编码提供。javax提供了几个常用的如：`@Email` `@Max` `@Min` `@NotEmpty` `@NotNull`
 ，而更复杂的业务校验注解通过自定义注解实现，如下：
 
-```Java
+```java
 // 自定义ConstraintValidator
 @Constraint(validatedBy = SignupUserInfoConstraintValidator.class)
 // 规范强调必须支持FIELD METHOD TYPE ANNOTAION_TYPE,其他的不做要求，是否支持得看具体实现
