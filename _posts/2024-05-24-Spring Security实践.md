@@ -1,6 +1,6 @@
 ---
 title: Spring Security 实践
-categories: [编程, Java, Spring]
+categories: [编程, Java]
 ---
 
 代码案例：[https://gitee.com/bao-tingyu/spring-security-oauth2.0-example](https://gitee.com/bao-tingyu/spring-security-oauth2.0-example)
