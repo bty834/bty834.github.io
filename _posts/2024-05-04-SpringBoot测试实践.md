@@ -1,7 +1,6 @@
 ---
 title: SpringBoot测试实践
 categories: [SpringBoot Test]
-extMath: false
 ---
 
 测试按照粒度可分为3层：

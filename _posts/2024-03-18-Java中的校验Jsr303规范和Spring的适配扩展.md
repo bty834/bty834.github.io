@@ -1,7 +1,6 @@
 ---
 title: Java中的校验：Jsr 303规范和Spring的适配扩展
-categories: [ Java,Spring ]
-extMath: true
+categories: [ Java, Spring ]
 ---
 
 

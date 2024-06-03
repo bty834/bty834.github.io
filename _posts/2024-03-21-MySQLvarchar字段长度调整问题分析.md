@@ -1,7 +1,6 @@
 ---
 title: MySQL OnlineDDL:varchar字段长度调整问题分析
 categories: [ MySQL ]
-extMath: false
 ---
 
 # 现象

@@ -1,7 +1,6 @@
 ---
-çtitle: 手写Maven插件生成MyBatis代码
+title: 手写Maven插件生成MyBatis代码
 categories: [Maven plugin]
-extMath: false
 ---
 
 

@@ -1,7 +1,6 @@
 ---
 title: IDEA插件开发：自动生成setter
 categories: [IDEA plugin]
-extMath: false
 ---
 
 # 背景

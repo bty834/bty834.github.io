@@ -1,7 +1,6 @@
 ---
 title: Spring Security 实践
 categories: [Spring Security]
-extMath: false
 ---
 
 代码案例：[https://gitee.com/bao-tingyu/spring-security-oauth2.0-example](https://gitee.com/bao-tingyu/spring-security-oauth2.0-example)
