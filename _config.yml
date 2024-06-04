@@ -14,12 +14,12 @@ timezone:
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: Bao Tingyu's Homepage # the main title
+title: Bao Tingyu's Blog # the main title
 
 tagline: A Java Backend Developer # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
-  Bao Tingyu's Homepage
+  Bao Tingyu's Blog
 
 # Fill in the protocol & hostname for your site.
 # e.g. 'https://username.github.io', note that it does not end with a '/'.
