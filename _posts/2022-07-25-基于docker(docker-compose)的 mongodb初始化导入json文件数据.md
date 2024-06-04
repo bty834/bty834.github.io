@@ -132,7 +132,7 @@ georgefloyd666@cock.li
 yourdad4@cock.li
 
 我也是醉了，发现之前设置的密码什么的都没用，可以直接登陆，原因是验证登陆没有开，开了之后，`mongod.conf`文件如下：
-```json
+```yaml
 # mongod.conf
 
 # for documentation of all options, see:
