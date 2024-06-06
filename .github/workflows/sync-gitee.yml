@@ -1,21 +1,18 @@
-name: Sync Repository Action
-on:
-  push:
-  schedule:
-    # 每天北京时间0点同步
-    - cron:  '0 16 * * *'
-
-
+name: Sync to Gitee
+on: [push]
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Sync to Gitee
-        uses: chenxudong2020/sync-gitee-action@v1
+      - name: checkout
+        uses: actions/checkout@master
+
+      - name: Async Github Branch To Gitee
+        uses: shanghaobo/github-branch-gitee@master
         with:
-          # gitee账号
+          github_repo: bty834/bty834.github.io
+          github_branch: main
+          gitee_repo: bao-tingyu/baotingyu.gitee.io.git
+          gitee_branch: master
           username: ${{ secrets.GITEE_USERNAME }}
-          # gitee密码
           password: ${{ secrets.GITEE_PASSWORD }}
-          # 需要同步的repo
-          repository: ${{ secrets.GITEE_REPO_NAME }}
