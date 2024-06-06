@@ -1,0 +1,20 @@
+name: Sync Repository Action
+on:
+  push:
+  schedule:
+    # 每天北京时间0点同步
+    - cron:  '0 16 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync to Gitee
+        uses: chenxudong2020/sync-gitee-action@v1
+        with:
+          # gitee账号
+          username: ${{ secrets.GITEE_USERNAME }}
+          # gitee密码
+          password: ${{ secrets.GITEE_PASSWORD }}
+          # 需要同步的repo
+          repository: ${{ secrets.GITEE_REPO_NAME }}
