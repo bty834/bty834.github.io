@@ -1,6 +1,7 @@
 ---
 title: 基于docker(docker-compose)的 mongodb初始化导入json文件数据
 categories: [编程, 中间件 ]
+tags: [docker,docker-compose,mongodb]
 ---
 
 最近在被割韭菜，遇到了一个问题，那就是如何在初始化mongodb容器的时候就把一些数据导入进去，并且是从一个json后缀的文件中导入。我翻遍国内平台，啥都解决不了，看了dockerhub中的mongo官方的用法也是含糊其辞。于是，我跑去stackoverflow和google搜了一下，然后又折腾了一会总算出来了。下面是两个相关的链接：

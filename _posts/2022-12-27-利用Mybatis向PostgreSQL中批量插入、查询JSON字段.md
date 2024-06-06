@@ -1,6 +1,7 @@
 ---
 title: 利用Mybatis向PostgreSQL中批量插入、查询JSON字段
 categories: [编程, Java ]
+tags: [mybatis,postgresql]
 ---
 
 这里我使用的是TimescaleDB，加了一个时间戳字段，不过没差。

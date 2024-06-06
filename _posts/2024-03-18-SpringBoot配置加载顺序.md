@@ -1,6 +1,7 @@
 ---
 title: SpringBoot配置加载顺序
 categories: [编程,Java]
+tags: [springboot]
 ---
 
 [Externalized Configuration](https://docs.spring.io/spring-boot/docs/1.5.22.RELEASE/reference/html/boot-features-external-config.html)

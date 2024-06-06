@@ -1,6 +1,7 @@
 ---
 title: IDEA插件开发：自动生成setter
 categories: [编程,plugin]
+tags: [idea plugin]
 ---
 
 # 背景
