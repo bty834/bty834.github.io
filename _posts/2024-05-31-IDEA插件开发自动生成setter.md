@@ -4,6 +4,8 @@ categories: [编程,plugin]
 tags: [idea plugin]
 ---
 
+我的Intellij插件主页：[Bao Tingyu](https://plugins.jetbrains.com/vendor/1b0d1834-d798-409c-82c2-adc1d3324dac)
+
 # 背景
 在给Java局部变量的实体赋值时，往往有很多setter，一个一个写很麻烦，也会漏掉，因此开发一款插件，可以自动生成局部变量实体的所有setter。
 
