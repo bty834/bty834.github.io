@@ -2,6 +2,7 @@
 title: SpringBoot application.yml/.properties配置文件加载过程
 categories: [编程, Java ]
 tags: [spring,springboot]
+math: true
 ---
 
 参考：[Springboot源码之application.yaml读取过程](https://blog.csdn.net/weixin_43843104/article/details/110131011?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164627388216780255276878%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164627388216780255276878&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~blog~baidu_landing_v2~default-2-110131011.nonecase&utm_term=springboot%E8%AF%BB%E5%8F%96application.yml%E8%BF%87%E7%A8%8B&spm=1018.2226.3001.4450)
