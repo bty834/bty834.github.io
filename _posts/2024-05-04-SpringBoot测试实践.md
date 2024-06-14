@@ -162,6 +162,11 @@ public class UnitTest {
         Mockito.verify(sampleRepository, Mockito.times(1)).selectSamples(any());
         // Mockito.verify(sampleRepository, Mockito.times(1)).selectSamples(argThat(i->i.equals(1)));
 
+        // capture参数验证
+        ArgumentCaptor<Long> paramCap = ArgumentCaptor.forClass(Long.class);
+        Mockito.verify(sampleRepository, Mockito.times(1)).selectSamples(paramCap.capture());
+        Assert.assertNotNull(paramCap.getValue());
+
         
         List<Sample> samples = sampleService.listSamples("1");
 
@@ -202,6 +207,7 @@ public class UnitTest {
 public class ControllerSliceTestWithPowerMockito {
 
     // @Import加入需要扫描的Bean
+    // @Configuration配合其他都行，参考@ContextConfiguration注释
     @Import(SampleController.class)
     static class Context {
 
@@ -232,6 +238,12 @@ public class ControllerSliceTestWithPowerMockito {
 
 # WebMvc 切片测试
 
+- @AutoConfigureWebMvc : Use this if you need to configure the web layer for testing but don't need to use MockMvc
+- @AutoConfigureMockMvc : Use this when you just want to configure MockMvc
+- @WebMvcTest : Includes both the @AutoConfigureWebMvc and the @AutoConfigureMockMvc, among other functionality.
+
+三者区别，参考：[What's the difference between @AutoConfigureWebMvc and @AutoConfigureMockMvc?](https://stackoverflow.com/questions/46343782/whats-the-difference-between-autoconfigurewebmvc-and-autoconfiguremockmvc)
+
 案例一：
 ```java
 @WebMvcTest(SampleController.class)
@@ -243,6 +255,7 @@ public class TestSampleController {
 
     // 这里填入需要扫描的Bean，这样就不用扫描整个project文件，加快测试速度
     @Import({SampleController.class, ControllerExceptionAdvice.class})
+    @Configuration // 这里兼容老版本，高版本不用加
     static class TestContext {
     }
 
