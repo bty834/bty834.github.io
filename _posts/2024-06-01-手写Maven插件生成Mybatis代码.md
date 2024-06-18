@@ -14,7 +14,7 @@ tags: [maven plugin]
 
 本文使用 [javapoet](https://github.com/square/javapoet)直接生成Java代码，使用[jdom2](http://jdom.org/)生成XML文件。
 
-# Maven 插件
+## Maven 插件
 自定义Maven插件
 可参考[Plugin Developers Centre](https://maven.apache.org/plugin-developers/index.html)
 
@@ -76,7 +76,7 @@ public class SQLTableGenMojo extends AbstractMojo {
 }
 ```
 
-# javapoet生成Java源代码
+## javapoet生成Java源代码
 javapoet通过Fluent api的方式构建代码：
 
 ```java
@@ -121,7 +121,7 @@ TypeSpec criterion = TypeSpec.classBuilder("Criterion")
                 ).build();
 ```
 
-# JDom2生成XML
+## JDom2生成XML
 
 ```java
 Document xml = new Document();

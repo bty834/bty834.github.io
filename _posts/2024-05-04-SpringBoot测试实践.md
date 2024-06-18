@@ -98,7 +98,7 @@ tags: [springboot test,unit test]
 
 ```
 
-# Mockito & PowerMockito 单元测试
+## Mockito & PowerMockito 单元测试
 当我们仅仅需要验证代码逻辑，不需要Spring的bean注入时，使用Mockito & PowerMockito来快速测试。
 
 Mockito用于mock对象便于对代码逻辑进行测试&验证，但Mockito mock的方法有限，无法mock final、private、static方法，而PowerMockito框架弥补了这一点。两者可以混合使用。
@@ -195,7 +195,7 @@ public class UnitTest {
 
 ```
 
-# Spring 测试
+## Spring 测试
 当依赖Spring时，可以利用Spring和PowerMockito一起完成mock和test
 
 案例：
@@ -236,7 +236,7 @@ public class ControllerSliceTestWithPowerMockito {
 
 
 
-# WebMvc 切片测试
+## WebMvc 切片测试
 
 - @AutoConfigureWebMvc : Use this if you need to configure the web layer for testing but don't need to use MockMvc
 - @AutoConfigureMockMvc : Use this when you just want to configure MockMvc

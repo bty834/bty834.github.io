@@ -10,7 +10,7 @@ tags: [docker,docker-compose,mongodb]
 
 参考上面两个链接基本就可以解决，不过我遇到了几个坑，所以记录一下
 
-# 前提
+## 前提
 [dockerhub mongo](https://hub.docker.com/_/mongo)
 
 三个环境变量：
@@ -28,7 +28,7 @@ tags: [docker,docker-compose,mongodb]
 > Initializing a fresh instance
 > When a container is started for the first time it will execute files with extensions .sh and .js that are found in /docker-entrypoint-initdb.d. ==Files will be executed in alphabetical order==. .js files will be executed by mongo using the database specified by the MONGO_INITDB_DATABASE variable, if it is present, or test otherwise. You may also switch databases within the .js script.
 
-# 实践操作最终版
+## 实践操作最终版
 ok，看完两个链接和官网文档，我做了如下配置：
 首先看看目录结构
 ![在这里插入图片描述](/assets/2022/07/25/1.png)
@@ -89,7 +89,7 @@ mongoimport --jsonArray --db jiefangProj --file /docker-entrypoint-initdb.d/data
 echo "########### Mongo DB data Loaded ###########"
 ```
 
-# 坑点
+## 坑点
 
 这个`02-init.sh`可把我坑惨了，最开始是：
 ```bash
@@ -125,7 +125,7 @@ echo "########### Mongo DB data Loaded ###########"
 
 -------------------------
 过了几天，我发现数据安全有问题，重新改善以下：
-# 数据被盗
+## 数据被盗
 发现mongodb数据老是被删除，然后还有一个新的collection显示的消息，这人英文不太好，太多病句：
 
 > All your data is a backed up. You must pay 0.01 BTC to 12nx7Q6FAczH6yfhaEMJRmvRkavDTcwUJK 48 hours for recover it. After 48 hours expiration we will leaked and exposed all your data. In case of refusal to pay, we will contact the General Data Protection Regulation, GDPR and notify them that you store user data in an open form and is not safe. Under the rules of the law, you face a heavy fine or arrest and your base dump will be dropped from our server! You can buy bitcoin here, does not take much time to buy https://localbitcoins.com with this guide https://localbitcoins.com/guides/how-to-buy-bitcoins After paying write to me in the mail with your DB IP:

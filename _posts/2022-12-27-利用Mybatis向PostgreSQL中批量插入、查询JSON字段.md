@@ -6,7 +6,7 @@ tags: [mybatis,postgresql]
 
 这里我使用的是TimescaleDB，加了一个时间戳字段，不过没差。
 关于PostgreSQL中Json数据类型的操作，可以[参考官网](https://www.postgresql.org/docs/current/functions-json.html)。
-### 应用场景介绍
+## 应用场景介绍
 将TCP发过来的数据包（通过消息队列发过来）解析出数据（一个数据包含有多帧，一帧中含有多条信息），并和本地规则表的格式对应起来。以`JsonLineMsg`实体类代表对应的一帧数据：
 
 ```java
@@ -32,7 +32,7 @@ public class JsonLineMsg {
 ![](/assets/2022/12/27/1.png)
 上面`JsonLineMsg`实体类的一个对象就代表的一帧中的所有数据项`many（key:value）`，`keyAndRuleData`字段用来存储所有数据项，在`psql`中对应一个类型为`json`（或`jsonb`）的字段。
 
-### 数据insert
+## 数据insert
 为了查询JSON中的字段，在insert的过程中有些注意事项，==如果插入时JSON格式不正确，查询JSON字段是总返回`null`==。记录一下：
 为了降低数据库打开关闭的耗时，每积累20帧持久化一次。
 ==note==:
@@ -98,7 +98,7 @@ public class JsonLineMsg {
 
 如果查看到类似于 `"{"1":"1_234"}"`、`{\"1\":\"1_123\"}`这样，格式就是不正确的，查询JSON中字段会返回null。
 
-### 数据select
+## 数据select
 
 ```xml
   <select id="selectValueData" resultType="String">
@@ -110,7 +110,7 @@ public class JsonLineMsg {
 ps: timescaledb官网推荐用jsonb，但是我测试发现jsonb查询插入都比不上json，不知道为啥
 ps: 发现了，原来是转换为tsdb时，索引没建立起来，重新建表又测试了一遍，确实jsonb读取快。
 
-### BATCH 批量插入
+## BATCH 批量插入
 
 ```java
 // 获取连接的方法，设置ExecutorType.BATCH以及关闭自动提交
@@ -141,7 +141,7 @@ ps: 发现了，原来是转换为tsdb时，索引没建立起来，重新建表
     }
 ```
 
-### SpringBoot中BATCH批量插入
+## SpringBoot中BATCH批量插入
 配置类，注入batch的`SqlSessionTemplate`的bean，另外`SqlSessionTemplate`不支持手动`commit`，而是通过`@Transactional`注解配置`commit`
 ```java
 @Configuration

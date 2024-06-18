@@ -6,7 +6,7 @@ tags: [idea plugin]
 
 我的Intellij插件主页：[Bao Tingyu](https://plugins.jetbrains.com/vendor/1b0d1834-d798-409c-82c2-adc1d3324dac)
 
-# 背景
+## 背景
 在给Java局部变量的实体赋值时，往往有很多setter，一个一个写很麻烦，也会漏掉，因此开发一款插件，可以自动生成局部变量实体的所有setter。
 
 插件效果如下：
@@ -15,7 +15,7 @@ tags: [idea plugin]
 可以在plugin marketplace 搜索：`Summon Setters`
 源码参考：[Summon-all-setters](https://github.com/bty834/Summon-all-setters)
 
-# 开发前
+## 开发前
 IDEA plugin 通过 Java 或 Kotlin 语言编写，官方目前推荐Kotlin语言，依赖管理使用 Gradle。
 插件框架初始化可以手动通过Gradle创建，也可以从[官方的Template](https://github.com/JetBrains/intellij-platform-plugin-template)下载，默认为Kotlin语言。
 
@@ -29,7 +29,7 @@ IDEA plugin 通过 Java 或 Kotlin 语言编写，官方目前推荐Kotlin语言
 
 为了方便查看文件的PSI树形结构，设置IDEA安装目录下的`bin`目录的`idea.properties`文件中的`idea.is.internal=true`，通过主菜单的`Tools`->`View PSI Structure`即可查看。 
 
-## 目录结构
+### 目录结构
 这里使用Github上的intellij-platform-plugin-template，目录结构如下：
 ```text
 .
@@ -58,7 +58,7 @@ IDEA plugin 通过 Java 或 Kotlin 语言编写，官方目前推荐Kotlin语言
                      └── pluginIcon.svg
 ```
 
-## 注意事项
+### 注意事项
 开发时，`gradle.properties` 中需要引入相关依赖：
 
 ```
@@ -91,7 +91,7 @@ README.md:
 ```
 同时默认的图标pluginIcon.svg需要替换掉，图标规范参考 [plugin-icon-file](https://plugins.jetbrains.com/docs/intellij/plugin-icon-file.html?from=jetbrains.org#plugin-logo-usages)
 
-# Summon Setters 插件开发
+## Summon Setters 插件开发
 
 在实施代码开发前，要考虑通过什么方式生成，自定义Action？自定义Extension？两种方式都能实现，参考了市面上的两种实现，发现第二种更直观简单写。
 

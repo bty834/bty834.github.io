@@ -3,7 +3,7 @@ title: MySQL OnlineDDL:varchar字段长度调整问题分析
 categories: [编程, MySQL ]
 ---
 
-# 现象
+## 现象
 
 修改表字段长度导致超时， 原表结构该字段为：
 ```sql
@@ -15,7 +15,7 @@ ALTER TABLE xxx MODIFY COLUMN  note varchar(63) DEFAULT '' COMMENT '备注';
 ```
 涉及修改字段的表数据量近3亿，执行时间超过3000s，导致Invalid Connection报错。
 
-# 原因
+## 原因
 
 更改varchar类型的字段长度，触发了Mysql Copy方式（即通过拷贝临时表的方式实现的，这期间原表只读不可写，同时也会增加一倍的存储空间）。
 

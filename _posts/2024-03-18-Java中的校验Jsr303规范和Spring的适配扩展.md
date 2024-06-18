@@ -19,7 +19,7 @@ tags: [jsr 303,spring]
 - *Spring Boot* ：spring-boot-starter-validation 和 spring-boot-starter-web ，web包提供了*Jsr303*
   的实现`hibernate-validator`
 
-# JSR 303
+## JSR 303
 
 原文请参考 [JSR 303: Bean Validation](https://beanvalidation.org/1.0/spec/)。
 
@@ -37,7 +37,7 @@ tags: [jsr 303,spring]
 
 约束主要围绕`@Constraint`注解和`javax.validation.ConstraintValidator`接口展开。
 
-# @Constraint和ConstraintValidator
+## @Constraint和ConstraintValidator
 
 一个校验规则由一个 `javax.validation.Constraint`注解 和 一组 `javax.validation.ConstraintValidator` 接口实现类组成。
 
@@ -123,7 +123,7 @@ public class SignupUserInfoConstraintValidator implements ConstraintValidator<Si
 
 **注意**：这里填的Class类型只能是**接口的Class**
 
-# Spring 的支持
+## Spring 的支持
 
 以上的场景是基于web的，实际上不管是*Jsr 303*规范本身的目的还是*Spring Validation*中提供的*Jsr 303*
 支持都不仅仅可以做web数据校验，像Swing或Ui层等都可以进行校验。*Spring Validation*更像是一种适配Spring体系的领域建模。
@@ -146,7 +146,7 @@ public class SignupUserInfoConstraintValidator implements ConstraintValidator<Si
 Web*提供对`@RequestBody`和`@ResponseBody`注解的参数的校验，且校验过程兼容*Jsr303*，至于*Jsr303*的实现是什么，*Spring Web*
 不在乎，像这里我引入`spring-boot-starter-validation`，里面*Jsr303*的实现就是`hibernate-validator`。
 
-## *Spring Web*中的RequestResponseBodyMethodProcessor
+### *Spring Web*中的RequestResponseBodyMethodProcessor
 
 该类用于解析`@RequestBody`的方法参数和`@ResponseBody`的返回值，利用`HttpMessageConverter`
 将请求体和响应体内容解析并生成对应的DTO和VO，在解析过程中会利用*Spring Validation*来完成校验。
@@ -190,7 +190,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 
 ```
 
-## *Spring Validation*中的ValidationAnnotationUtils
+### *Spring Validation*中的ValidationAnnotationUtils
 
 该类属于*Spring Validation*，不是*Spring Web*的。Spring 5.3.7版本后才有。
 
@@ -230,7 +230,7 @@ public abstract class ValidationAnnotationUtils {
 }
 ```
 
-## *Spring Web*中的DataBinder
+### *Spring Web*中的DataBinder
 
 ```java
 public class DataBinder implements PropertyEditorRegistry, TypeConverter {
@@ -264,7 +264,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 }
 ```
 
-# Hibernate的实现配置
+## Hibernate的实现配置
 
 如果不通过`springboot-starter-web`包来使用hibernate，可以直接引入下面的hibernate包的maven坐标：
 
@@ -301,7 +301,7 @@ public class ValidatorConfiguration {
 }
 ```
 
-# 注解支持
+## 注解支持
 
 目前Spring仅默认支持@RequestBody的参数校验，可以自定义AOP切面实现普通方法的校验。
 
