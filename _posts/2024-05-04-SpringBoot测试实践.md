@@ -103,6 +103,8 @@ tags: [springboot test,unit test]
 
 Mockito用于mock对象便于对代码逻辑进行测试&验证，但Mockito mock的方法有限，无法mock final、private、static方法，而PowerMockito框架弥补了这一点。两者可以混合使用。
 
+
+
 案例：
 ```java
 
@@ -193,7 +195,17 @@ public class UnitTest {
 
 }
 
+
+
+
 ```
+
+> @Mock和@MockBean使用格式：Mockito.when(localVar.method()).thenXxx...
+>
+> @Spy和@SpyBean使用格式：Mockito.doXxx().when(localVar).method()
+> 
+> 使用不当会报NPE
+{: .prompt-warning }
 
 ## Spring 测试
 当依赖Spring时，可以利用Spring和PowerMockito一起完成mock和test
@@ -220,7 +232,7 @@ public class ControllerSliceTestWithPowerMockito {
     private SampleConverter sampleConverter;
 
 
-    @Before
+    @Test
     public void zkSetup() {
         PowerMockito.mockStatic(SampleUtil.class);
         PowerMockito.when(SampleUtil.getSomething(eq("a")))
@@ -233,7 +245,6 @@ public class ControllerSliceTestWithPowerMockito {
 
 }
 ```
-
 
 
 ## WebMvc 切片测试
