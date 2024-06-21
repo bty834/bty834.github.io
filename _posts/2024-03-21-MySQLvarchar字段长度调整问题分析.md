@@ -5,7 +5,9 @@ categories: [编程, MySQL ]
 
 ## 现象
 
-修改表字段长度导致超时， 原表结构该字段为：
+修改表字段长度导致超时。
+
+原表结构该字段为：
 ```sql
 `note` varchar(45) CHARATER SET uft8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '备注'
 ```
