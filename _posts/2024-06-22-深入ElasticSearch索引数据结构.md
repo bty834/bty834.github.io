@@ -1,5 +1,5 @@
 ---
-title: 深入理解ElasticSearch索引数据结构
+title: ElasticSearch索引架构与存储数据结构
 categories: [编程, 中间件]
 tags: [elasticsearch]
 ---
@@ -27,14 +27,52 @@ ES主要的使用场景如下：
 - [ElasticSearch Docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html)
 - [Elasticsearch 教程](https://dunwu.github.io/db-tutorial/pages/74675e/)
 
-本文介绍了ES索引涉及到的数据结构。
+官方讨论社区：[discuss.elastic.co](https://discuss.elastic.co/)
+官方博客：[elastic.co/cn/blog](https://www.elastic.co/cn/blog)
+本文介绍了ES索引的存储架构和数据结构。
+
+
+
+## ES Index Storage Architecture
+
+ES底层搜索使用的仍然是Lucene引擎，但Lucene只支持单节点搜索，不具备扩展性，ES在其基础上提供了分布式环境下的支持。
+
+![](/assets/2024/06/22/architecture.png)
+
+关于Lucene Index:
+
+> index in Lucene means "a collection of segments plus a commit point"
+
+关于Segment:
+
+> A shard in Elasticsearch is a Lucene index, and a Lucene index is broken down into segments.
+
+
+
+- [Understanding Segments in Elasticsearch](https://stackoverflow.com/questions/15426441/understanding-segments-in-elasticsearch)
+- [segment、buffer和translog对实时性的影响](https://elkguide.elasticsearch.cn/elasticsearch/principle/realtime.html)
+- [Near real-time search](https://www.elastic.co/guide/en/elasticsearch/reference/current/near-real-time.html)
+
+
+在我们变更document时，实际上会document会生成一系列数据结构放入Segment中，放入的过程是先放入文件系统缓存（内存中）再刷到磁盘，放到文件系统缓存中即可被检索到，这个文件系统缓存刷新(refresh)间隔默认为1秒 (注意：只针对30秒内有查询的索引生效)，
+所以说ES准实时。同时，会有translog保证文件写入磁盘时的数据一致性，如果刷盘期间发生故障，可以通过translog进行数据恢复，等到真正把 segment 刷到磁盘(flush)，且 commit 文件进行更新的时候， translog 文件才清空。
+
+索引数据的一致性通过 translog 保证。那么 translog 文件刷盘本身如何保证一致性 ？ 类比MySQL等关系数据库的处理，这里肯定有同步/异步刷盘策略，
+默认情况下，Elasticsearch 每 5 秒，或每次每次 index、bulk、delete、update结束前，会强制刷新 translog 日志到磁盘上。
+
+索引查询时会依次检索各个Segment，同时后台也会有线程执行Segment合并动作，也可以手动执行强制合并，提升Segment检索效率。
+一般索引会按时间周期性新建，老的索引不再写入，这些不再写入的索引可以进行强制段合并操作，提升查询性能(一个Shard中多个Segment是串行查询的)。
+
+- [segment merge对写入性能的影响](https://elkguide.elasticsearch.cn/elasticsearch/principle/indexing-performance.html)
+- [段合并优化及注意事项](https://learnku.com/articles/41593)
+
+
+## ES Index
 
 首先明确两个概念：**正排索引** 和 **倒排索引**。正派索引是根据文档（文档id）找到文档的value, 倒排索引是拿着文档的value找到对应的文档（文档id）。
 
 ![](/assets/2024/06/22/index.png)
 
-
-# Inverted Index
 
 ES中根据不同的字段类型和查询方式， 底层会使用不同的数据结构进行倒排索引存储，这些索引存在于内存中。
 
@@ -55,7 +93,7 @@ ES中根据不同的字段类型和查询方式， 底层会使用不同的数�
 查询方式：
 
 查询Context可分为：
-- Query Context : `How well does this document match this query clause?` 查询结果根据 relevance score 排序； 
+- Query Context : `How well does this document match this query clause?` 查询结果根据 relevance score 排序；
 - Filter Context : `Does this document match this query clause?` 不参与打分，且结果会被缓存。
 
 | 查询类别                | 类型                                                                                                                                      |
@@ -71,26 +109,44 @@ ES中根据不同的字段类型和查询方式， 底层会使用不同的数�
 | Term-level queries  | exists, fuzzy, ids, prefix, range, regexp, term, terms, terms_set, wildcard                                                             |
 | Other               | text_expansion, minimum_should_match, regexp, query_string                                                                              |
 
+### Segment存储
 
-- Keyword/Text: Term Index + Term Dictionary + Posting List
-- Numeric: KBD Tree
+Segment中存储了以下内容：
 
-[ES中的FST数据结构](https://juejin.cn/post/7244335987576602680)
+- [Segment info](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50SegmentInfoFormat.html): This contains metadata about a segment, such as the number of documents, what files it uses,
+- [Field names](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50FieldInfosFormat.html): This contains the set of field names used in the index.
+- [Stored Field values](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50StoredFieldsFormat.html): This contains, for each document, a list of attribute-value pairs, where the attributes are field names. These are used to store auxiliary information about the document, such as its title, url, or an identifier to access a database. The set of stored fields are what is returned for each hit when searching. This is keyed by document number.
+- [Term dictionary](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50PostingsFormat.html): A dictionary containing all the terms used in all the indexed fields of all the documents. The dictionary also contains the number of documents which contain the term, and pointers to the term's frequency and proximity data.
+- [Term Frequency data](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50PostingsFormat.html): For each term in the dictionary, the numbers of all the documents that contain that term, and the frequency of the term in that document, unless frequencies are omitted (IndexOptions.DOCS_ONLY)
+- [Term Proximity data](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50PostingsFormat.html): For each term in the dictionary, the positions that the term occurs in each document. Note that this will not exist if all fields in all documents omit position data.
+- [Normalization factors](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50NormsFormat.html): For each field in each document, a value is stored that is multiplied into the score for hits on that field.
+- [Term Vectors](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50TermVectorsFormat.html): For each field in each document, the term vector (sometimes called document vector) may be stored. A term vector consists of term text and term frequency. To add Term Vectors to your index see the Field constructors
+- [Per-document values](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50DocValuesFormat.html): Like stored values, these are also keyed by document number, but are generally intended to be loaded into main memory for fast access. Whereas stored values are generally intended for summary results from searches, per-document values are useful for things like scoring factors.
+- [Live documents](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50LiveDocsFormat.html): An optional file indicating which documents are live.
 
-## Term Index + Term Dictionary + Posting List
+可以参看：
+- [A Dive into the Elasticsearch Storage](https://www.elastic.co/cn/blog/found-dive-into-elasticsearch-storage)
+- [Apache Lucene - Index File Formats](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/package-summary.html#package_description)
+
+
+### Inverted Index
+
+
+- [ES中的FST数据结构](https://juejin.cn/post/7244335987576602680)
+
+### Term Index + Term Dictionary + Posting List
 
 ![](/assets/2024/06/22/inverted_index.png)
 
 
+#### FST
 
-### FST
 
+### KBD Tree
 
-## KBD Tree
+## Forward Index
 
-# Forward Index
-
-## Doc values
+### Doc values
 
 
 
