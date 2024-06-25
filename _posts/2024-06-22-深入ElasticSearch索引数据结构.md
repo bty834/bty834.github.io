@@ -23,7 +23,9 @@ ES主要的使用场景如下：
 3. 作为冗余数据提供多样化查询方式：如SQL分库分表无法支持非分片键字段的查询，使用ES冗余数据支持多样化查询；
 4. 跨库关联查询：将跨库数据关联冗余至ES，关联查询直接查ES，同时解决了跨库分页的问题。
 
-关于ElasticSearch的基本概念可以参看：
+关于ElasticSearch的基本概念和原理可以参看：
+
+- [分布式文档存储](https://www.elastic.co/guide/cn/elasticsearch/guide/current/distributed-docs.html)
 - [ElasticSearch Docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html)
 - [从原理到应用，Elasticsearch详解](https://segmentfault.com/a/1190000020022504)
 - [Elasticsearch 教程](https://dunwu.github.io/db-tutorial/pages/74675e/)
@@ -127,6 +129,10 @@ Segment中存储了以下内容：
 - [Per-document values](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50DocValuesFormat.html): Like stored values, these are also keyed by document number, but are generally intended to be loaded into main memory for fast access. Whereas stored values are generally intended for summary results from searches, per-document values are useful for things like scoring factors.
 - [Live documents](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/Lucene50LiveDocsFormat.html): An optional file indicating which documents are live.
 
+对应存储的文件如下：
+
+![](/assets/2024/06/22/files.png)
+
 可以参看：
 - [A Dive into the Elasticsearch Storage](https://www.elastic.co/cn/blog/found-dive-into-elasticsearch-storage)
 - [Apache Lucene - Index File Formats](https://lucene.apache.org/core/5_1_0/core/org/apache/lucene/codecs/lucene50/package-summary.html#package_description)
@@ -134,12 +140,14 @@ Segment中存储了以下内容：
 
 ### Inverted Index
 
-
-- [ES中的FST数据结构](https://juejin.cn/post/7244335987576602680)
-
 #### Term Index + Term Dictionary + Posting List
 
-![](/assets/2024/06/22/inverted_index.png)
+[美团外卖搜索基于Elasticsearch的优化实践
+](https://tech.meituan.com/2022/11/17/elasicsearch-optimization-practice-based-on-run-length-encoding.html)
+
+
+输入查询多个Terms，会对每个Term依次从 Term Index -> Term Dictionary -> Posting List 找到
+
 
 
 #### FST
