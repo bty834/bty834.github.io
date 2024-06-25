@@ -19,16 +19,19 @@ tags: [elasticsearch]
 
 ES主要的使用场景如下：
 1. 日志、指标等数据的存储和分析；
-2. 复杂查询：如电商系统的商品检索、github站内repository检索；
-3. 作为冗余数据提供多样化查询方式：SQL分库分表无法支持非分片键字段的查询，使用ES冗余数据支持多样化查询；
+2. 复杂查询：如电商系统的商品检索、github站内检索；
+3. 作为冗余数据提供多样化查询方式：如SQL分库分表无法支持非分片键字段的查询，使用ES冗余数据支持多样化查询；
 4. 跨库关联查询：将跨库数据关联冗余至ES，关联查询直接查ES，同时解决了跨库分页的问题。
 
 关于ElasticSearch的基本概念可以参看：
 - [ElasticSearch Docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html)
+- [从原理到应用，Elasticsearch详解](https://segmentfault.com/a/1190000020022504)
 - [Elasticsearch 教程](https://dunwu.github.io/db-tutorial/pages/74675e/)
 
 官方讨论社区：[discuss.elastic.co](https://discuss.elastic.co/)
+
 官方博客：[elastic.co/cn/blog](https://www.elastic.co/cn/blog)
+
 本文介绍了ES索引的存储架构和数据结构。
 
 
@@ -63,6 +66,7 @@ ES底层搜索使用的仍然是Lucene引擎，但Lucene只支持单节点搜索
 索引查询时会依次检索各个Segment，同时后台也会有线程执行Segment合并动作，也可以手动执行强制合并，提升Segment检索效率。
 一般索引会按时间周期性新建，老的索引不再写入，这些不再写入的索引可以进行强制段合并操作，提升查询性能(一个Shard中多个Segment是串行查询的)。
 
+- [ElasticSearch中使用Index Template、Index Alias和Rollover 维护索引](https://bty834.github.io/posts/ES%E6%BB%9A%E5%8A%A8%E7%B4%A2%E5%BC%95/)
 - [segment merge对写入性能的影响](https://elkguide.elasticsearch.cn/elasticsearch/principle/indexing-performance.html)
 - [段合并优化及注意事项](https://learnku.com/articles/41593)
 
