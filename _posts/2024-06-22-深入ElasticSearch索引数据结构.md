@@ -93,12 +93,11 @@ ES中根据不同的字段类型和查询方式， 底层会使用不同的数�
 | Spatial data types           | geo_point, geo_shape, point shape                                                                                                 |
 | Other types                  | **Arrays**, Multi-fields                                                                                                          |
 
-
-查询方式：
-
 查询Context可分为：
 - Query Context : `How well does this document match this query clause?` 查询结果根据 relevance score 排序；
 - Filter Context : `Does this document match this query clause?` 不参与打分，且结果会被缓存。
+
+查询方式：
 
 | 查询类别                | 类型                                                                                                                                      |
 |---------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
@@ -138,7 +137,7 @@ Segment中存储了以下内容：
 
 - [ES中的FST数据结构](https://juejin.cn/post/7244335987576602680)
 
-### Term Index + Term Dictionary + Posting List
+#### Term Index + Term Dictionary + Posting List
 
 ![](/assets/2024/06/22/inverted_index.png)
 
@@ -146,11 +145,11 @@ Segment中存储了以下内容：
 #### FST
 
 
-### KBD Tree
+#### KBD Tree
 
-## Forward Index
+### Forward Index
 
-### Doc values
+#### Doc values
 
 
 
