@@ -169,6 +169,13 @@ public class UnitTest {
         Mockito.verify(sampleRepository, Mockito.times(1)).selectSamples(paramCap.capture());
         Assert.assertNotNull(paramCap.getValue());
 
+        // 运行参数中的Runnable
+        Mockito.doAnswer(invocation -> {
+            Object[] arguments = invocation.getArguments();
+            Runnable runnable = (Runnable)arguments[0];
+            runnable.run();
+            return null;
+        }).when(sampleRepository).run(any(Runnable.class));
         
         List<Sample> samples = sampleService.listSamples("1");
 
