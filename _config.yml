@@ -16,7 +16,7 @@ timezone: Asia/Shanghai
 
 title: Bao Tingyu's Blog # the main title
 
-tagline: A Java Backend Developer # it will display as the sub-title
+tagline: a Java Backend Developer # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   Bao Tingyu's Blog
