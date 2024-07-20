@@ -19,13 +19,16 @@ tags: [idea plugin]
 IDEA plugin 通过 Java 或 Kotlin 语言编写，官方目前推荐Kotlin语言，依赖管理使用 Gradle。
 插件框架初始化可以手动通过Gradle创建，也可以从[官方的Template](https://github.com/JetBrains/intellij-platform-plugin-template)下载，默认为Kotlin语言。
 
-参考文档：
+参考文档/视频：
 - [Developing a Plugin](https://plugins.jetbrains.com/docs/intellij/developing-plugins.html)
 - [idea插件开发文档](https://www.ideaplugin.com/idea-docs/)
+- [The Easy Way to Create IntelliJ Plugins](https://www.youtube.com/watch?v=GcYa4lMRta0&t=395s)
 
 也可以参考开源的插件实现，在 [Intellij Plugin Marketplace](https://plugins.jetbrains.com/)搜索相关功能插件，点开`Source Code`栏（可能没有）
 
 同时IDEA可安装插件开发插件：`Plugin DevKit`。
+
+macos 按住快捷键 `option+command`点击组件 可查看该组件信息。
 
 为了方便查看文件的PSI树形结构，设置IDEA安装目录下的`bin`目录的`idea.properties`文件中的`idea.is.internal=true`，通过主菜单的`Tools`->`View PSI Structure`即可查看。 
 
