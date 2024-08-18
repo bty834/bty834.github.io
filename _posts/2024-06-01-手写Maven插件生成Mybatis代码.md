@@ -1,18 +1,19 @@
 ---
-title: 手写Maven插件生成MyBatis代码
+title: 手写Maven插件实现MyBatis代码生成
 categories: [编程,plugin]
 tags: [maven plugin]
 ---
 
+官方mybatis generator使用案例：[mybatis-generator-example](https://github.com/bty834/mybatis-generator-example)
 
-代码链接：[codegen-maven-plugin](https://gitee.com/bao-tingyu/codegen-maven-plugin)
+手写代码链接：[codegen-maven-plugin](https://gitee.com/bao-tingyu/codegen-maven-plugin)
 
 在使用MyBatis时，需要根据库表结构编写一些通用的Mapper interface、XML、Entity，这些重复操作可以通过代码生成器自动生成，大大提高开发效率。
 目前，代码生成分为两种方式：
 - 模版引擎：如 `velocity`
 - 代码直接生成：如 `javapoet`
 
-本文使用 [javapoet](https://github.com/square/javapoet)直接生成Java代码，使用[jdom2](http://jdom.org/)生成XML文件。
+本案例使用 [javapoet](https://github.com/square/javapoet)直接生成Java代码，使用[jdom2](http://jdom.org/)生成XML文件。
 
 ## Maven 插件
 自定义Maven插件
