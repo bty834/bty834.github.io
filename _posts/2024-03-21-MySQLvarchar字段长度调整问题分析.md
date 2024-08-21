@@ -38,6 +38,7 @@ Mysql 8.0 支持的方式，如下图所示，一共有三种方式：Instant、
 
 
 最终解决调整SQL如下:
+
 ```sql
 ALTER TABLE xxx MODIFY COLUMN  note varchar(63) DEFAULT '' COMMENT '备注',ALGORITHM=INPLACE,LOCK=NONE;
 ```
@@ -46,5 +47,6 @@ ALTER TABLE xxx MODIFY COLUMN  note varchar(63) DEFAULT '' COMMENT '备注',ALGO
 
 此外，如果对表结构有较大变动，而又不想影响业务正常运行，可以使用类似copy表的方式，将源表复制出来一份，数据完全复制到新表后再进行表名替换，替换是原子的，该实践有现成的轮子如：
 
+- gh-ost
 - pt-online-schema-change  
 - OnlineSchemaChange
