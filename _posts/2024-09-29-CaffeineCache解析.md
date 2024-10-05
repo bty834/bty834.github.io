@@ -28,9 +28,13 @@ Caffeine的性能benchmark可参考[Caffeine Benchmarks](https://github.com/ben-
         Cache<String, String> cache = Caffeine.newBuilder()
                                           .expireAfterWrite(Duration.ofHours(1))
                                           .build();
-        cache.put("hello", "world");
+        
         // null表示不存在key
         @Nullable String val = cache.getIfPresent("hello");
+        if (val == null) {
+            cache.put("hello", "world");
+        }
+        
         // key不存在则走后面的loading function
         String val2 = cache.get("hello", key -> "world");
 
@@ -68,6 +72,63 @@ CacheCache按不同维度划分：
 - `LocalCache`: 提供核心存储能力，线程安全和原子能力保证，继承自`java.util.concurrent.ConcurrentMap`；
 - `LocalManualCache`: 基于`LocalCache`做存储的非自动Loading Cache；
 - `LocalLoadingCache`: 继承自`LocalManualCache`，新增Loading功能。
+
+
+
+关于以上接口的一个关键抽象实现类`BoundedLocalCache`，其作用解释如下：
+
+> This class performs a best-effort bounding of a ConcurrentHashMap using a page-replacement algorithm to determine which entries to evict when the capacity is exceeded.
+
+可知该抽象类利用**溢出淘汰算法**保证了ConcurrentHashMap的有限容量，下面分别从并发、淘汰机制、过期策略来讨论`BoundedLocalCache`。
+
+## BoundedLocalCache
+
+### Node
+
+`BoundedLocalCache`最终借助`ConcurrentHashMap<Object, Node<K, V>>`(CHM)类型的data字段存储数据，
+数据value被包装成一个`com.github.benmanes.caffeine.cache.Node`放入CHM中，Node中包含以下信息：
+
+- key和value的引用（key包含强弱引用，value包含强软弱引用）
+- 权重信息
+- 状态： alive retired dead
+- Access order ：按access顺序的一个双向链表节点信息
+- Write order ：按write顺序的一个双向链表节点信息
+- Variable order ：按过期时间顺序的一个双向链表节点信息，大多为Access order或Write order节点
+
+#### 强软弱引用
+
+#### Node状态
+
+页面置换算法（page replacement policy）
+
+> alive: it is in both the hash table and the page replacement policy. 
+> retired: it is not in the hash table and is pending removal from the page replacement policy.
+> dead: it is not in the hash table nor the page replacement policy.
+
+
+#### Node链表
+
+Node除了作为CHM中的value，还会作为构成其他3个链表（access order, write order , variable order）的节点，
+示意图如下：
+
+
+
+####  Window TinyLFU Eviction
+
+> Maximum size is implemented using the Window TinyLfu policy due to its high hit rate, O(1) time complexity, and small footprint.
+
+首先来了解下常提的LRU和LFU有什么问题：
+
+LRU: 最近最少使用，会淘汰掉最久未被访问的数据，实现简单，但遇到突发流量，会把之前的缓存内容全部刷掉；
+LFU和TinyLFU: 最少频率使用，利用使用次数排序，将使用最少的淘汰掉，缺点是需要额外维护一个频率map(Tiny-LFU对空间做了优化)，以及会累计历史频率，当前热点可能会被误淘汰。
+
+
+
+
+
+
+
+但更新缓存kv时， 数据并不会立即写入到该CHM中，而是通过一个buffer异步写入，并且写入不能保证严格的顺序性。
 
 
 
