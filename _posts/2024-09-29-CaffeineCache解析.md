@@ -13,10 +13,8 @@ tags: [ caffeine cache]
 - key支持weak reference
 - value支持weak reference和soft reference
 - 淘汰（或移除）通知
-- todo
 - 缓存获取数据统计
 
-Caffeine基于[JSR-107 JCache](https://www.jcp.org/en/jsr/detail?id=107)规范实现。
 Caffeine的性能benchmark可参考[Caffeine Benchmarks](https://github.com/ben-manes/caffeine/wiki/Benchmarks)，
 可以看到Caffeine在不同读写比的情况下， 吞吐量比Guava Cache和Jdk内置的HashMap都有较大提升。
 接下来了解下Caffeine的使用和实现原理。
@@ -73,15 +71,96 @@ CacheCache按不同维度划分：
 - `LocalManualCache`: 基于`LocalCache`做存储的非自动Loading Cache；
 - `LocalLoadingCache`: 继承自`LocalManualCache`，新增Loading功能。
 
-
-
 关于以上接口的一个关键抽象实现类`BoundedLocalCache`，其作用解释如下：
 
 > This class performs a best-effort bounding of a ConcurrentHashMap using a page-replacement algorithm to determine which entries to evict when the capacity is exceeded.
 
-可知该抽象类利用**溢出淘汰算法**保证了ConcurrentHashMap的有限容量，下面分别从并发、淘汰机制、过期策略来讨论`BoundedLocalCache`。
+
+## TinyLFU & W-TinyLFU
+
+在看`BoundedLocalCache`类前先来了解下TinyLFU & W-TinyLFU算法，
+算法出自论文：[TinyLFU: A Highly Efficient Cache Admission Policy](https://arxiv.org/pdf/1512.00727)
+
+- admission policy：控制一个元素是否能进入缓存
+- eviction policy：当缓存满了时选择哪一个元素剔除缓存
+
+论文中提出的TinyLFU指的是admission policy，
+TinyLFU可以和 LRU 、SLRU 的eviction policy组合。
+
+比如 论文中使用W-TinyLFU + LRU + SLRU的组合进行实验：
+>  Window Tiny LFU (W-TinyLFU) ... consists of two cache areas.
+> The main cache employs the SLRU eviction policy and TinyLFU admission policy 
+> while the window cache employs an LRU eviction policy without any admission policy.
+
+![](/assets/2024/09/29/w-tinylfu.png)
+
+可以看到 W-TinyLFU 的main cache area 使用 TinyLFU 作为 admission policy。
+
+TinyLFU 在 LFU的基础上 加了Tiny，而Tiny体现在counter计数（和frequency正相关） 的记录上。
+通常大部分缓存的元素访问频率都会很小，如果使用integer来记录counter计数，会导致空间浪费，因此
+TinyLFU 借助 `approximate counting scheme` 来记录counter计数，其原理和bloom filter类似，而 schema的具体实现有：
+- `Counting Bloom Filter`
+- `CM-Sketch` : Caffeine中使用该实现，参见类`com.github.benmanes.caffeine.cache.FrequencySketch`，论文可参考：[An Improved Data Stream Summary: The Count-Min Sketch and its Applications](http://dimacs.rutgers.edu/~graham/pubs/papers/cm-full.pdf)
+
+Caffeine中的`CM-Sketch`使用4bit记录counter次数，最大只能到15，
+并使用`long[]`类型存储，一个元素可存储16个计数器，`long[]`即相当于论文中的二维数组。
+
+此外还增加了一个`DoorKeeper`即一个`Bloom Filter`来优先存储counter计数为1的元素，大于1的才会进入`CM-Sketch`结构中。
+
+此外，TinyLFU利用Freshness Mechanism保证TinyLFU计数器记录的次数不会无限制扩大：
+
+> Every time we add an item to the approximation sketch, we increment a counter. 
+> Once this counter reaches the sample size (W), we divide it and all other counters in the
+> approximation sketch by 2.
+
+对应的可以在`FrequencySketch`类的`increment`方法中找到`reset`方法的调用：
+
+```java
+// This class maintains a 4-bit CountMinSketch.
+// The maximum frequency of an element is limited to 15 (4-bits) 
+// and an aging process periodically halves the popularity of all elements.
+final class FrequencySketch<E> {
+  ...
+  int sampleSize;
+  int size;
+
+  public void ensureCapacity(@NonNegative long maximumSize) {
+    ...
+    sampleSize = (maximumSize == 0) ? 10 : (10 * maximum);
+    if (sampleSize <= 0) {
+      sampleSize = Integer.MAX_VALUE;
+    }
+    size = 0;
+  }
+
+  // 计数器次数小于15时才会增加计数器
+  public void increment(@NonNull E e) {
+    ...
+    boolean added = ...
+    if (added && (++size == sampleSize)) {
+      reset();
+    }
+  }
+  ...
+}
+```
+
 
 ## BoundedLocalCache
+
+
+### DrainStatusRef和false sharing
+```java
+abstract class BoundedLocalCache<K, V> extends BLCHeader.DrainStatusRef<K, V>
+    implements LocalCache<K, V>
+```
+可以看到BoundedLocalCache继承自DrainStatusRef，DrainStatusRef的作用如注释：
+> Enforces a memory layout to avoid false sharing by padding the drain status.
+
+关于伪共享（false sharing）可参考 [伪共享（false sharing），并发编程无声的性能杀手](https://www.cnblogs.com/cyfonly/p/5800758.html)
+
+
+
 
 ### Node
 
@@ -109,27 +188,6 @@ CacheCache按不同维度划分：
 #### Node链表
 
 Node除了作为CHM中的value，还会作为构成其他3个链表（access order, write order , variable order）的节点，
-示意图如下：
-
-
-
-####  Window TinyLFU Eviction
-
-> Maximum size is implemented using the Window TinyLfu policy due to its high hit rate, O(1) time complexity, and small footprint.
-
-首先来了解下常提的LRU和LFU有什么问题：
-
-LRU: 最近最少使用，会淘汰掉最久未被访问的数据，实现简单，但遇到突发流量，会把之前的缓存内容全部刷掉；
-LFU和TinyLFU: 最少频率使用，利用使用次数排序，将使用最少的淘汰掉，缺点是需要额外维护一个频率map(Tiny-LFU对空间做了优化)，以及会累计历史频率，当前热点可能会被误淘汰。
-
-
-
-
-
-
-
-但更新缓存kv时， 数据并不会立即写入到该CHM中，而是通过一个buffer异步写入，并且写入不能保证严格的顺序性。
-
 
 
 
