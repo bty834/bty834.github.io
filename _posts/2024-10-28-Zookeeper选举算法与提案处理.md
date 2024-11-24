@@ -1,5 +1,5 @@
 ---
-title: 共识算法ZAB与Zookeeper分布式锁实践
+title: Zookeeper选举算法与提案处理概览
 categories: [ 编程, Zookeeper ]
 tags: [ zookeeper ]
 ---
@@ -48,7 +48,7 @@ zk以形如linux文件系统的树形层级结构管理数据，如下图所示�
 
 同时znode节点可设置为以下特性：
 - ephemeral: 和session生命周期相同
-- sequential: 顺序节点，比如创建顺序节点/a/b，则会生成/a/b/0000000001 ，再次创建/a/b，则会生成/a/b/0000000002
+- sequential: 顺序节点，比如创建顺序节点/a/b，则会生成/a/b0000000001 ，再次创建/a/b，则会生成/a/b0000000002
 - container: 容器节点，用于存放其他节点的节点，子节点无则它也无了，监听container节点需要考虑节点不存在的情况
 
 
@@ -378,33 +378,87 @@ public class FastLeaderElection implements Election {
 ```
 
 
+### 提案处理
 
-### Recovery Phase 
 
-### Broadcast Phase
+![](/assets/2024/10/28/zkServer.png)
 
-Packet  :  a sequence of bytes sent through a FIFO channel
+所有的提案均通过leader来提，follower接受的提案会转发到leader。
+zk采用责任链模式对请求进行处理，不同的角色（leader/follower/observer）对应不同的责任链：
 
-Proposal  :  a unit of agreement. Proposals are agreed upon by exchanging packets with a quorum of ZooKeeper servers. Most proposals contain messages, however the NEW_LEADER proposal is an example of a proposal that does not correspond to a message.
+![](/assets/2024/10/28/processorChain.png)
 
-Message  :  a sequence of bytes to be atomically broadcast to all ZooKeeper servers. A message put into a proposal and agreed upon before it is delivered.
+以下是leader的各个Processor的作用
 
-The zxid has two parts: the epoch and a counter.
+- `LeaderRequestProcessor`: Responsible for performing local session upgrade. Only request submitted directly to the leader should go through this processor.
+- `PrepRequestProcessor`: It sets up any transactions associated with requests that change the state of the system
+- `ProposalRequestProcessor`: 调用`Leader#propose`将proposal加入发送给follower的queue，由LeaderHandler异步发送给follower和处理follower的ack
+- `SyncRequestProcessor`: 将request写磁盘 
+- `AckRequestProcessor`: ack leader自己的request
+- `CommitProcessor`: 提交提案。`CommitProcessor`本身是一个线程，上游调用先把request加入队列，然后异步消费处理
+- `ToBeAppliedRequestProcessor`: simply maintains the toBeApplied list
+- `FinalRequestProcessor`: This Request processor actually applies any transaction associated with a request and services any queries
 
-ZooKeeper messaging consists of two phases:
-1. Leader activation : In this phase a leader establishes the correct state of the system and gets ready to start making proposals.
-2. Active messaging : In this phase a leader accepts messages to propose and coordinates message delivery.
 
-A leader becomes active only when a quorum of followers (The leader counts as a follower as well. You can always vote for yourself ) has synced up with the leader, they have the same state.
+接收follower的ack并提交走下面的调用：
+```java
+org.apache.zookeeper.server.quorum.Leader.LearnerCnxAcceptor#run
+org.apache.zookeeper.server.quorum.Leader.LearnerCnxAcceptor.LearnerCnxAcceptorHandler#run
+org.apache.zookeeper.server.quorum.Leader.LearnerCnxAcceptor.LearnerCnxAcceptorHandler#acceptConnections
+org.apache.zookeeper.server.quorum.LearnerHandler#run
+org.apache.jute.BinaryInputArchive#readRecord
+org.apache.zookeeper.server.quorum.LearnerMaster#processAck 这里如果满足quorum则调用CommitProcessor
+org.apache.zookeeper.server.quorum.Leader#tryToCommit
+org.apache.zookeeper.server.quorum.Leader#commit (leader 发送commit消息给follower，此时leader还不一定提交了，因为异步处理的) 
+org.apache.zookeeper.server.quorum.Leader#inform (leader 发送inform消息给observer，此时leader还不一定提交了，因为异步处理的)
+```
 
-two leader election algorithms in ZooKeeper: 
-- LeaderElection
-- FastLeaderElection
+判断是否满足quorum的方法为：`SyncedLearnerTracker#hasAllQuorums` ，
 
-ZooKeeper messaging doesn't care about the exact method of electing a leader has long as the following holds:
-1. The leader has seen the highest zxid of all the followers.
-2. A quorum of servers have committed to following the leader.
+```java
+public class SyncedLearnerTracker { // Proposal的父类，即每个提案一个Tracker
 
+    public static class QuorumVerifierAcksetPair {
+        private final QuorumVerifier qv; // 每一个zxid就是一个QuorumVerifier
+        private final HashSet<Long> ackset; // ack的sid set
+        ...
+    }
+  
+    protected ArrayList<QuorumVerifierAcksetPair> qvAcksetPairs = new ArrayList<>();
+    ...
+
+    public boolean hasAllQuorums() {
+        for (QuorumVerifierAcksetPair qvAckset : qvAcksetPairs) {
+            if (!qvAckset.getQuorumVerifier().containsQuorum(qvAckset.getAckset())) {
+                return false;
+            }
+        }
+        return true;
+    }
+   
+    ...
+}
+```
+
+最终调用`QuorumMaj#containsQuorum`：
+
+```java
+public class QuorumMaj implements QuorumVerifier {
+    ...
+    protected int half = votingMembers.size() / 2;
+    
+    /**
+     * Verifies if a set is a majority. Assumes that ackSet contains acks only
+     * from votingMembers
+     */
+    public boolean containsQuorum(Set<Long> ackSet) {
+        return (ackSet.size() > half);
+    }
+    ...
+```
+
+
+## 参考
 - [Consensus Algorithms in Distributed Systems](https://www.baeldung.com/cs/consensus-algorithms-distributed-systems)
 - [FLP Impossibility Result](https://www.the-paper-trail.org/post/2008-08-13-a-brief-tour-of-flp-impossibility/)
 - [zookeeperInternals](https://zookeeper.apache.org/doc/r3.4.13/zookeeperInternals.html#sc_atomicBroadcast)
