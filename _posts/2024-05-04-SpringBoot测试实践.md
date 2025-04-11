@@ -112,6 +112,8 @@ Mockito用于mock对象便于对代码逻辑进行测试&验证，但Mockito moc
 // mock static method
 @PrepareOnlyThisForTest({SampleUtil.class})
 @PowerMockIgnore({"javax.net.ssl.*","javax.management.*", "javax.security.*", "javax.crypto.*"})
+// 如果SampleUtil中有静态字段，这里抑制静态字段初始化，否则会报错
+@SuppressStaticInitializationFor("com.a.b.c.SampleUtil")
 public class UnitTest {
 
 
